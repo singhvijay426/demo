@@ -1,0 +1,386 @@
+<html>
+<head>
+</head>
+<body>
+USE [StudentDatabase]
+GO
+ 
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ 
+ALTER PROCEDURE [dbo].[select_student]
+AS
+BEGIN
+	select * from Student_Data
+END
+
+
+
+USE [StudentDatabase]
+GO
+ 
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ 
+ALTER PROCEDURE [dbo].[select_student_by_name]
+	@Student_Id int
+AS
+	
+BEGIN
+	select * from Student_Data where Student_Id=@Student_Id
+END
+
+
+USE [StudentDatabase]
+GO
+ 
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ 
+ALTER PROCEDURE [dbo].[student_delete]
+	@Student_Id int
+AS
+	
+BEGIN
+	delete from Student_Data where Student_Id=@Student_Id
+END
+
+
+USE [StudentDatabase]
+GO
+ 
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ 
+ALTER PROCEDURE [dbo].[student_insert]
+	@Name varchar(30) = '',
+	@Course varchar(50) = '',
+	@Semester varchar(20) = '',
+	@University varchar(50) = '',
+	@EmailAddress varchar(50) = '',
+	@Password varchar(50) = ''
+AS
+	
+BEGIN
+	insert into Student_Data(Name,Course,Semester,University, EmailAddress, [Password])
+	values (@Name,@Course,@Semester,@University,@EmailAddress,@Password)
+END
+
+USE [StudentDatabase]
+GO
+ 
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ 
+ALTER PROCEDURE [dbo].[student_update]
+	@Student_Id int,
+	@Name varchar(30) = '',
+	@Course varchar(50) = '',
+	@Semester varchar(20) = '',
+	@University varchar(50) = '',
+	@EmailAddress varchar(50) = '',
+	@Password varchar(50) = ''	
+AS
+	
+BEGIN
+	update Student_Data set Name=@Name,Course=@Course,Semester=@Semester,University=@University,EmailAddress=@EmailAddress,[Password]=@Password
+	where Student_Id=@Student_Id
+END
+
+
+
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Database_Operations.aspx.cs"
+    Inherits="Database_Insrt_Updt_dlt.Database_Operations" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<style type="text/css">
+    .DetailsRequired
+    {
+        font-size: 15px;
+        color: red;
+    }
+</style>
+
+    <form id="form1" runat="server">
+    <div style="font-family: Aharoni; font-size: 30px; text-align: center; margin: 30px;">
+        <asp:Label ID="lblHead" runat="server" Text="Insert Update Delete Operation In SQL Server Using Stored Procedure"
+            Font-Underline="True"></asp:Label>
+    </div>
+    <hr />
+    <br />
+    <br />
+    <center>
+        <div style="font-size: 25px; text-align: left; border: 2px solid black; width: 700px;
+            padding: 30px;">
+            <div style="text-align: center;">
+                Select Student For Update :
+                <asp:DropDownList ID="ddlStudent" runat="server" AutoPostBack="True" OnSelectedIndexChanged="ddlStudent_SelectedIndexChanged">
+                </asp:DropDownList>
+                &nbsp; &nbsp; &nbsp;
+                <asp:Button ID="btnInsertNew" runat="server" Text="Insert New" Width="150px" Font-Size="22px"
+                    OnClick="btnInsertNew_Click" />
+            </div>
+            <br />
+            <hr />
+            <table cellspacing="10px" cellpadding="5px">
+                <tr>
+                    <td>
+                        Name :<font style="color: red">*</font>
+                    </td>
+                    <td>
+                        <asp:TextBox ID="txtName" runat="server"></asp:TextBox>
+                        <asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" ControlToValidate="txtName"
+                            Display="Dynamic" CssClass="DetailsRequired" ValidationGroup="login" ErrorMessage="Name required!"></asp:RequiredFieldValidator>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Email Address :<font style="color: red">*</font>
+                    </td>
+                    <td>
+                        <asp:TextBox ID="txtEmailAddress" runat="server"></asp:TextBox>
+                        <asp:RequiredFieldValidator ID="rfvtxtEmail" runat="server" ControlToValidate="txtEmailAddress"
+                            Display="Dynamic" CssClass="DetailsRequired" ValidationGroup="login" ErrorMessage="Email address required!"></asp:RequiredFieldValidator>
+                        <asp:RegularExpressionValidator ID="revtxtEmail" runat="server" ControlToValidate="txtEmailAddress"
+                            ValidationExpression="\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*" Display="Dynamic"
+                            ValidationGroup="login" CssClass="DetailsRequired" ErrorMessage="Sorry this email address is not recognized."></asp:RegularExpressionValidator>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Password :<font style="color: red">*</font>
+                    </td>
+                    <td>
+                        <asp:TextBox ID="txtPassword" runat="server" TextMode="Password"></asp:TextBox>
+                        <asp:RequiredFieldValidator ID="rfvtxtPassword" runat="server" ControlToValidate="txtPassword"
+                            Display="Dynamic" CssClass="DetailsRequired" ValidationGroup="login" ErrorMessage="Password required!"></asp:RequiredFieldValidator>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Course :
+                    </td>
+                    <td>
+                        <asp:TextBox ID="txtCourse" runat="server"></asp:TextBox>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Semester :
+                    </td>
+                    <td>
+                        <asp:DropDownList ID="ddlSemester" runat="server" Style="height: 20px; width: 180px;">
+                            <asp:ListItem Value="first">First</asp:ListItem>
+                            <asp:ListItem Value="second">Second</asp:ListItem>
+                            <asp:ListItem Value="third">Third</asp:ListItem>
+                            <asp:ListItem Value="fourth">Fourth</asp:ListItem>
+                            <asp:ListItem Value="fifth">Fifth</asp:ListItem>
+                            <asp:ListItem Value="sixth">Sixth</asp:ListItem>
+                        </asp:DropDownList>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        University :
+                    </td>
+                    <td>
+                        <asp:TextBox ID="txtUniversity" runat="server"></asp:TextBox>
+                    </td>
+                </tr>
+            </table>
+            <hr />
+            <div style="text-align: center; padding: 10px;">
+                <asp:Button ID="btnSave" runat="server" Text="Save" Width="150px" Font-Size="22px"
+                    OnClick="btnSave_Click" ValidationGroup="login" />&nbsp; &nbsp; &nbsp;
+                <asp:Button ID="bntCancel" runat="server" Text="Cancel" Width="150px" Font-Size="22px"
+                    OnClick="bntCancel_Click" />&nbsp; &nbsp; &nbsp;
+                <asp:Button ID="btnDelete" runat="server" Text="Delete" Width="150px" Font-Size="22px"
+                    OnClick="bntDelete_Click" />
+            </div>
+        </div>
+    </center>
+    </form>
+
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data;
+using System.Data.SqlClient;
+using System.Configuration;
+
+namespace Database_Insrt_Updt_dlt
+{
+    public partial class Database_Operations : System.Web.UI.Page
+    {
+        public SqlConnection con;
+        public SqlCommand cmd;
+        public SqlDataAdapter da;
+        public DataSet ds;
+        public DataTable dt;
+        string strcon = "Data Source=SERVERNAME; Initial Catalog=DATABASENAME; Integrated Security=True";
+
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            Connection_Data();
+            if (!IsPostBack)
+                Student_Bind();
+        }
+
+        protected void btnInsertNew_Click(object sender, EventArgs e)
+        {
+            //Insert new records
+            ddlStudent.SelectedIndex = 0;
+            ClearAll();
+            txtName.Focus();
+        }
+
+        protected void bntCancel_Click(object sender, EventArgs e)
+        {
+            //Clear all controls
+            ClearAll();
+            ddlStudent.SelectedIndex = 0;
+        }
+
+        protected void btnSave_Click(object sender, EventArgs e)
+        {
+            con.Open();
+            if (ddlStudent.SelectedIndex == 0)
+            {
+                //Insert data into database
+                cmd.CommandText = "student_insert";
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("Name", txtName.Text);
+                cmd.Parameters.AddWithValue("Course", txtCourse.Text);
+                cmd.Parameters.AddWithValue("Semester", ddlSemester.SelectedItem.Value);
+                cmd.Parameters.AddWithValue("University", txtUniversity.Text);
+                cmd.Parameters.AddWithValue("EmailAddress", txtEmailAddress.Text);
+                cmd.Parameters.AddWithValue("Password", txtPassword.Text);
+                cmd.ExecuteNonQuery();
+                con.Close();
+            }
+            else
+            {
+                //Update student details
+                cmd.CommandText = "student_update";
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("Student_Id", Convert.ToInt32(ddlStudent.SelectedItem.Value));
+                cmd.Parameters.AddWithValue("Name", txtName.Text);
+                cmd.Parameters.AddWithValue("Course", txtCourse.Text);
+                cmd.Parameters.AddWithValue("Semester", ddlSemester.SelectedItem.Value.ToString());
+                cmd.Parameters.AddWithValue("University", txtUniversity.Text);
+                cmd.Parameters.AddWithValue("EmailAddress", txtEmailAddress.Text);
+                cmd.Parameters.AddWithValue("Password", txtPassword.Text);
+                cmd.ExecuteNonQuery();
+                con.Close();
+            }
+            Student_Bind();
+            ClearAll();
+        }
+
+        protected void bntDelete_Click(object sender, EventArgs e)
+        {
+            //Delete student details
+            con.Open();
+            if (ddlStudent.SelectedIndex != 0)
+            {
+                cmd.CommandText = "student_delete";
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("Student_Id", Convert.ToInt32(ddlStudent.SelectedItem.Value));
+                cmd.ExecuteNonQuery();
+                con.Close();
+                Student_Bind();
+                ClearAll();
+            }
+        }
+
+        protected void ddlStudent_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            //Load student details in input fields
+            if (ddlStudent.SelectedIndex > 0)
+            {
+                con.Open();
+                cmd.CommandText = "select_student_by_name";
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("Student_Id", Convert.ToInt32(ddlStudent.SelectedItem.Value));
+                da.Fill(dt);
+                con.Close();
+                foreach (DataRow row in dt.Rows)
+                {
+                    txtName.Text = row["Name"].ToString();
+                    txtCourse.Text = row["Course"].ToString();
+                    ddlSemester.SelectedValue = row["Semester"].ToString();
+                    txtUniversity.Text = row["University"].ToString();
+                    txtEmailAddress.Text = row["EmailAddress"].ToString();
+                    txtPassword.Attributes.Add("value", row["Password"].ToString());
+                }
+                dt.Clear();
+            }
+            else
+            {
+                ClearAll();
+            }
+        }  
+
+        private void Connection_Data()
+        {
+            con = new SqlConnection(strcon);
+            cmd = new SqlCommand();
+            cmd.Connection = con;
+            da = new SqlDataAdapter(cmd);
+            ds = new DataSet();
+            dt = new DataTable();
+        }
+
+        private void Student_Bind()
+        {
+            //Bind Student dropdownlist
+            Connection_Data();
+            con.Open();
+            cmd.CommandText = "select_student";
+            cmd.CommandType = CommandType.StoredProcedure;
+            da.Fill(dt);
+            con.Close();
+            if (dt.Rows.Count > 0)
+            {
+                ddlStudent.DataValueField = "Student_Id";
+                ddlStudent.DataTextField = "Name";
+                ddlStudent.DataSource = dt;
+                ddlStudent.DataBind();
+            }
+            ddlStudent.Items.Insert(0, "Select Student");
+            dt.Clear();
+        }
+
+        private void ClearAll()
+        {
+            txtName.Text = "";
+            txtCourse.Text = "";
+            txtUniversity.Text = "";
+            txtPassword.Text = "";
+            txtEmailAddress.Text = "";
+            ddlSemester.SelectedIndex = 0;
+            txtPassword.Attributes.Add("value", "");
+        }
+              
+    }
+}
+
+
+</body>
+</html>
