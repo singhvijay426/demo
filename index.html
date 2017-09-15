@@ -216,171 +216,163 @@ END
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
-
-namespace Database_Insrt_Updt_dlt
+public partial class Default2 : System.Web.UI.Page
 {
-    public partial class Database_Operations : System.Web.UI.Page
+    public SqlConnection con;
+    public SqlCommand cmd;
+    public SqlDataAdapter da;
+    public DataSet ds;
+    public DataTable dt;
+    string strcon = "Data Source=.\\SQLEXPRESS;"+ "Initial Catalog=StudentDatabase; Integrated Security=True";
+
+    protected void Page_Load(object sender, EventArgs e)
     {
-        public SqlConnection con;
-        public SqlCommand cmd;
-        public SqlDataAdapter da;
-        public DataSet ds;
-        public DataTable dt;
-        string strcon = "Data Source=SERVERNAME; Initial Catalog=DATABASENAME; Integrated Security=True";
+        Connection_Data();
+        if (!IsPostBack)
+            Student_Bind();
+    }
 
-        protected void Page_Load(object sender, EventArgs e)
+    protected void btnInsertNew_Click(object sender, EventArgs e)
+    {
+        //Insert new records
+        ddlStudent.SelectedIndex = 0;
+        ClearAll();
+        txtName.Focus();
+    }
+
+    protected void bntCancel_Click(object sender, EventArgs e)
+    {
+        //Clear all controls
+        ClearAll();
+        ddlStudent.SelectedIndex = 0;
+    }
+
+    protected void btnSave_Click(object sender, EventArgs e)
+    {
+        con.Open();
+        if (ddlStudent.SelectedIndex == 0)
         {
-            Connection_Data();
-            if (!IsPostBack)
-                Student_Bind();
+            //Insert data into database
+            cmd.CommandText = "student_insert";
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("Name", txtName.Text);
+            cmd.Parameters.AddWithValue("Course", txtCourse.Text);
+            cmd.Parameters.AddWithValue("Semester", ddlSemester.SelectedItem.Value);
+            cmd.Parameters.AddWithValue("University", txtUniversity.Text);
+            cmd.Parameters.AddWithValue("EmailAddress", txtEmailAddress.Text);
+            cmd.Parameters.AddWithValue("Password", txtPassword.Text);
+            cmd.ExecuteNonQuery();
+            con.Close();
         }
-
-        protected void btnInsertNew_Click(object sender, EventArgs e)
+        else
         {
-            //Insert new records
-            ddlStudent.SelectedIndex = 0;
-            ClearAll();
-            txtName.Focus();
+            //Update student details
+            cmd.CommandText = "student_update";
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("Student_Id", Convert.ToInt32(ddlStudent.SelectedItem.Value));
+            cmd.Parameters.AddWithValue("Name", txtName.Text);
+            cmd.Parameters.AddWithValue("Course", txtCourse.Text);
+            cmd.Parameters.AddWithValue("Semester", ddlSemester.SelectedItem.Value.ToString());
+            cmd.Parameters.AddWithValue("University", txtUniversity.Text);
+            cmd.Parameters.AddWithValue("EmailAddress", txtEmailAddress.Text);
+            cmd.Parameters.AddWithValue("Password", txtPassword.Text);
+            cmd.ExecuteNonQuery();
+            con.Close();
         }
+        Student_Bind();
+        ClearAll();
+    }
 
-        protected void bntCancel_Click(object sender, EventArgs e)
+    protected void bntDelete_Click(object sender, EventArgs e)
+    {
+        //Delete student details
+        con.Open();
+        if (ddlStudent.SelectedIndex != 0)
         {
-            //Clear all controls
-            ClearAll();
-            ddlStudent.SelectedIndex = 0;
-        }
-
-        protected void btnSave_Click(object sender, EventArgs e)
-        {
-            con.Open();
-            if (ddlStudent.SelectedIndex == 0)
-            {
-                //Insert data into database
-                cmd.CommandText = "student_insert";
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("Name", txtName.Text);
-                cmd.Parameters.AddWithValue("Course", txtCourse.Text);
-                cmd.Parameters.AddWithValue("Semester", ddlSemester.SelectedItem.Value);
-                cmd.Parameters.AddWithValue("University", txtUniversity.Text);
-                cmd.Parameters.AddWithValue("EmailAddress", txtEmailAddress.Text);
-                cmd.Parameters.AddWithValue("Password", txtPassword.Text);
-                cmd.ExecuteNonQuery();
-                con.Close();
-            }
-            else
-            {
-                //Update student details
-                cmd.CommandText = "student_update";
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("Student_Id", Convert.ToInt32(ddlStudent.SelectedItem.Value));
-                cmd.Parameters.AddWithValue("Name", txtName.Text);
-                cmd.Parameters.AddWithValue("Course", txtCourse.Text);
-                cmd.Parameters.AddWithValue("Semester", ddlSemester.SelectedItem.Value.ToString());
-                cmd.Parameters.AddWithValue("University", txtUniversity.Text);
-                cmd.Parameters.AddWithValue("EmailAddress", txtEmailAddress.Text);
-                cmd.Parameters.AddWithValue("Password", txtPassword.Text);
-                cmd.ExecuteNonQuery();
-                con.Close();
-            }
+            cmd.CommandText = "student_delete";
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("Student_Id", Convert.ToInt32(ddlStudent.SelectedItem.Value));
+            cmd.ExecuteNonQuery();
+            con.Close();
             Student_Bind();
             ClearAll();
         }
+    }
 
-        protected void bntDelete_Click(object sender, EventArgs e)
+    protected void ddlStudent_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        //Load student details in input fields
+        if (ddlStudent.SelectedIndex > 0)
         {
-            //Delete student details
             con.Open();
-            if (ddlStudent.SelectedIndex != 0)
-            {
-                cmd.CommandText = "student_delete";
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("Student_Id", Convert.ToInt32(ddlStudent.SelectedItem.Value));
-                cmd.ExecuteNonQuery();
-                con.Close();
-                Student_Bind();
-                ClearAll();
-            }
-        }
-
-        protected void ddlStudent_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            //Load student details in input fields
-            if (ddlStudent.SelectedIndex > 0)
-            {
-                con.Open();
-                cmd.CommandText = "select_student_by_name";
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("Student_Id", Convert.ToInt32(ddlStudent.SelectedItem.Value));
-                da.Fill(dt);
-                con.Close();
-                foreach (DataRow row in dt.Rows)
-                {
-                    txtName.Text = row["Name"].ToString();
-                    txtCourse.Text = row["Course"].ToString();
-                    ddlSemester.SelectedValue = row["Semester"].ToString();
-                    txtUniversity.Text = row["University"].ToString();
-                    txtEmailAddress.Text = row["EmailAddress"].ToString();
-                    txtPassword.Attributes.Add("value", row["Password"].ToString());
-                }
-                dt.Clear();
-            }
-            else
-            {
-                ClearAll();
-            }
-        }  
-
-        private void Connection_Data()
-        {
-            con = new SqlConnection(strcon);
-            cmd = new SqlCommand();
-            cmd.Connection = con;
-            da = new SqlDataAdapter(cmd);
-            ds = new DataSet();
-            dt = new DataTable();
-        }
-
-        private void Student_Bind()
-        {
-            //Bind Student dropdownlist
-            Connection_Data();
-            con.Open();
-            cmd.CommandText = "select_student";
+            cmd.CommandText = "select_student_by_name";
             cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("Student_Id", Convert.ToInt32(ddlStudent.SelectedItem.Value));
             da.Fill(dt);
             con.Close();
-            if (dt.Rows.Count > 0)
+            foreach (DataRow row in dt.Rows)
             {
-                ddlStudent.DataValueField = "Student_Id";
-                ddlStudent.DataTextField = "Name";
-                ddlStudent.DataSource = dt;
-                ddlStudent.DataBind();
+                txtName.Text = row["Name"].ToString();
+                txtCourse.Text = row["Course"].ToString();
+                ddlSemester.SelectedValue = row["Semester"].ToString();
+                txtUniversity.Text = row["University"].ToString();
+                txtEmailAddress.Text = row["EmailAddress"].ToString();
+                txtPassword.Attributes.Add("value", row["Password"].ToString());
             }
-            ddlStudent.Items.Insert(0, "Select Student");
             dt.Clear();
         }
-
-        private void ClearAll()
+        else
         {
-            txtName.Text = "";
-            txtCourse.Text = "";
-            txtUniversity.Text = "";
-            txtPassword.Text = "";
-            txtEmailAddress.Text = "";
-            ddlSemester.SelectedIndex = 0;
-            txtPassword.Attributes.Add("value", "");
+            ClearAll();
         }
-              
+    }
+
+    private void Connection_Data()
+    {
+        con = new SqlConnection(strcon);
+        cmd = new SqlCommand();
+        cmd.Connection = con;
+        da = new SqlDataAdapter(cmd);
+        ds = new DataSet();
+        dt = new DataTable();
+    }
+
+    private void Student_Bind()
+    {
+        //Bind Student dropdownlist
+        Connection_Data();
+        con.Open();
+        cmd.CommandText = "select_student";
+        cmd.CommandType = CommandType.StoredProcedure;
+        da.Fill(dt);
+        con.Close();
+        if (dt.Rows.Count > 0)
+        {
+            ddlStudent.DataValueField = "Student_Id";
+            ddlStudent.DataTextField = "Name";
+            ddlStudent.DataSource = dt;
+            ddlStudent.DataBind();
+        }
+        ddlStudent.Items.Insert(0, "Select Student");
+        dt.Clear();
+    }
+
+    private void ClearAll()
+    {
+        txtName.Text = "";
+        txtCourse.Text = "";
+        txtUniversity.Text = "";
+        txtPassword.Text = "";
+        txtEmailAddress.Text = "";
+        ddlSemester.SelectedIndex = 0;
+        txtPassword.Attributes.Add("value", "");
     }
 }
-
-
 </body>
 </html>
