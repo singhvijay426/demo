@@ -41,7 +41,7 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
  
-ALTER PROCEDURE [dbo].[select_student]
+CREATE PROCEDURE [dbo].[select_student]
 AS
 BEGIN
 	select * from Student_Data
@@ -57,7 +57,7 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
  
-ALTER PROCEDURE [dbo].[select_student_by_name]
+CREATE PROCEDURE [dbo].[select_student_by_name]
 	@Student_Id int
 AS
 	
@@ -74,7 +74,7 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
  
-ALTER PROCEDURE [dbo].[student_delete]
+CREATE PROCEDURE [dbo].[student_delete]
 	@Student_Id int
 AS
 	
@@ -91,7 +91,7 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
  
-ALTER PROCEDURE [dbo].[student_insert]
+CREATE PROCEDURE [dbo].[student_insert]
 	@Name varchar(30) = '',
 	@Course varchar(50) = '',
 	@Semester varchar(20) = '',
@@ -113,7 +113,7 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
  
-ALTER PROCEDURE [dbo].[student_update]
+CREATE PROCEDURE [dbo].[student_update]
 	@Student_Id int,
 	@Name varchar(30) = '',
 	@Course varchar(50) = '',
